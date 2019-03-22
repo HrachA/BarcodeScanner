@@ -1,7 +1,6 @@
 #include<opencv2/opencv.hpp>
 #include<iostream>
 #include<vector>
-#include"Functions.cpp"
 
 using namespace std;
 using namespace cv;
@@ -35,7 +34,7 @@ int main()
 	
 
 	imshow("Window", img);
-	//	imwrite("grabCut.png", img);
+	//	imwrite("", img);
 	waitKey(0);
 	return 0;
 }
