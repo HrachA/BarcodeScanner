@@ -283,8 +283,16 @@ vector<int> GetInfo(Mat& img)
 //recovers barcode from binary code?
 Mat RecoverBarcode(string code)
 {
+	Mat BarCode(400, 95*5 + 40, CV_8UC3, Scalar(255, 255, 255));
 
-	return Mat();
+	for (int i = 0; i < 95; i++)
+	{
+		if (code[i] == '1')
+		{
+			line(BarCode, Point(i * 5 + 22, 20), Point(i * 5 + 22, 380), Scalar(0, 0, 0), 5);
+		}
+	}
+	return BarCode;
 }
 
 int main()
@@ -294,9 +302,12 @@ int main()
 	
 	HoughTransform(img);
 	AdaptiveBinarization(img);
-	vector<int> vec = GetInfo(img);
+	string code = GetBinaryCode(img);
+	Mat newImg=RecoverBarcode(code);
+	vector<int> vec = GetNumbers(code);
 
-	imshow("Window", img);
+	imshow("Window", newImg);
+	imwrite("recovered.jpg", newImg);
 	waitKey(0);
 	return 0;
 }
