@@ -1,4 +1,5 @@
 ﻿  Barcode.cpp
-c:\users\admin\source\imageprocessing\barcodescanner\barcodescanner\barcode.cpp(88): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\admin\source\imageprocessing\barcodescanner\barcodescanner\barcode.cpp(202): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\admin\source\imageprocessing\barcodescanner\barcodescanner\barcode.cpp(130): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\admin\source\imageprocessing\barcodescanner\barcodescanner\barcode.cpp(248): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\admin\source\imageprocessing\barcodescanner\barcodescanner\barcode.cpp(356): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   BarcodeScanner.vcxproj -> C:\Users\admin\source\ImageProcessing\BarcodeScanner\x64\Debug\BarcodeScanner.exe
