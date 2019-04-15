@@ -1,3 +1,6 @@
+// Hrach Ayunc, Artyom Hakobyan, Toma Hovhannisyan
+// Barcode decoder and retriever
+
 #include<opencv2/opencv.hpp>
 #include<iostream>
 #include<vector>
@@ -41,20 +44,6 @@ void MedianFilter(Mat& img)
 			}
 		}
 	}
-}
-
-void Negative(Mat& img)
-{
-	for (int i = 0; i < img.rows; i++)
-	{
-		for (int j = 0; j < img.cols; j++)
-		{
-			img.at<Vec3b>(i, j)[0] = 255 - img.at<Vec3b>(i, j)[0];
-			img.at<Vec3b>(i, j)[1] = 255 - img.at<Vec3b>(i, j)[1];
-			img.at<Vec3b>(i, j)[2] = 255 - img.at<Vec3b>(i, j)[2];
-		}
-	}
-	return;
 }
 
 void AdaptiveBinarization(Mat& img)
@@ -116,7 +105,7 @@ void HoughTransform(Mat& img)
 
 	int numberOfPoints = 100;
 	numberOfPoints += (img.rows*img.cols - 40000) * 200 / (3000000 - 40000);
-	cout << "Number of points: " << numberOfPoints << endl;
+//	cout << "Number of points: " << numberOfPoints << endl;
 //	cout << "Pixture size: " << img.size() << endl;
 	vector<Vec2f> lines;
 	HoughLines(dst, lines, 1, CV_PI / 180, numberOfPoints, 0, 0);
@@ -124,12 +113,11 @@ void HoughTransform(Mat& img)
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		float rho = lines[i][0], theta = lines[i][1];
-		cout << theta << ends;
-	
+//		cout << theta << ends;
+
 		if (theta > CV_PI / 2)
 			theta = -CV_PI + theta;
-		cout << theta << endl;
-
+//		cout << theta << endl;
 
 		avgTheta += theta;
 		Point pt1, pt2;
@@ -139,21 +127,21 @@ void HoughTransform(Mat& img)
 		pt1.y = cvRound(y0 + 1000 * (a));
 		pt2.x = cvRound(x0 - 1000 * (-b));
 		pt2.y = cvRound(y0 - 1000 * (a));
-			
+
 		line(lineSave, pt1, pt2, Scalar(255, 0, 0), 5, LINE_AA);
 	}
 //	namedWindow("detected lines", WINDOW_AUTOSIZE & WINDOW_NORMAL);
 //	imshow("detected lines", lineSave);
 //	imwrite("lines.jpg", lineSave);
-	
+
 
 	avgTheta /= lines.size();
-	cout << "Average theta before: " << avgTheta << std::endl;
+//	cout << "Average theta before: " << avgTheta << std::endl;
 	if (avgTheta > CV_PI / 2)
-		avgTheta = - CV_PI + avgTheta;
+		avgTheta = -CV_PI + avgTheta;
 
 	avgTheta = avgTheta * 180 / CV_PI;
-	cout << "Average theta after: " << avgTheta << endl;
+//	cout << "Average theta after: " << avgTheta << endl;
 	if (avgTheta >= -10 && avgTheta <= 10)
 		avgTheta = 0;
 
@@ -180,10 +168,8 @@ string GetBinaryCode(Mat& img)
 		for (int j = 1; j < img.cols - 1; ++j)
 		{
 			if (img.at<Vec3b>(i, j)[0] == 0 &&
-				//img.at<Vec3b>(i + 1, j)[0] == 0 &&
 				img.at<Vec3b>(i, j + 1)[0] == 0 &&
 				img.at<Vec3b>(i + 1, j + 1)[0] == 0 &&
-				//img.at<Vec3b>(i - 1, j)[0] == 0 &&
 				img.at<Vec3b>(i - 1, j + 1)[0] == 0 &&
 				img.at<Vec3b>(i - 1, j - 1)[0] == 255 &&
 				img.at<Vec3b>(i, j - 1)[0] == 255 &&
@@ -206,10 +192,8 @@ string GetBinaryCode(Mat& img)
 		for (int j = img.cols - 2; j > 0; --j)
 		{
 			if (img.at<Vec3b>(i, j)[0] == 0 &&
-				img.at<Vec3b>(i + 1, j)[0] == 0 &&
 				img.at<Vec3b>(i, j - 1)[0] == 0 &&
 				img.at<Vec3b>(i + 1, j - 1)[0] == 0 &&
-				img.at<Vec3b>(i - 1, j)[0] == 0 &&
 				img.at<Vec3b>(i - 1, j - 1)[0] == 0 &&
 				img.at<Vec3b>(i - 1, j + 1)[0] == 255 &&
 				img.at<Vec3b>(i, j + 1)[0] == 255 &&
@@ -226,18 +210,17 @@ string GetBinaryCode(Mat& img)
 		}
 	}
 
-	// to change
 	Point p1(start.y, start.x);
 	Point p2(end.y, end.x);
 
-//	line(img, p1, p2, Scalar(255, 0, 0), 5, LINE_AA);
+	//	line(img, p1, p2, Scalar(255, 0, 0), 5, LINE_AA);
 
-	cout <<"Points: " << start << ' ' << end << endl;
+//	cout << "Points: " << start << ' ' << end << endl;
 	int length = end.y - start.y + 1;
-	cout <<"Length: " << length << endl;
+//	cout << "Length: " << length << endl;
 
 	double delta = length / 95.0;
-	cout <<"Delta: " << delta << endl;
+//	cout << "Delta: " << delta << endl;
 
 	for (int i = 0; i < 95; ++i)
 	{
@@ -250,13 +233,23 @@ string GetBinaryCode(Mat& img)
 				count1++;
 			else
 				count0++;
+
+			if (img.at<Vec3b>(start.x - 5, ind)[0] < 10)
+				count1++;
+			else
+				count0++;
+
+			if (img.at<Vec3b>(start.x + 5, ind)[0] < 10)
+				count1++;
+			else
+				count0++;
 		}
 		code.push_back(count0 > count1 ? '0' : '1');
 	}
 
 	line(img, p1, p2, Scalar(0, 255, 0), 1, LINE_AA);
-	imshow("Line", img);
-	cout << code << endl;
+//	imshow("Line", img);
+//	cout << code << endl;
 	return code;
 }
 
@@ -291,8 +284,7 @@ vector<int> GetNumbers(string code)
 			n = 9;
 		numbers.push_back(n);
 	}
-//	cout << numbers[0] << numbers[1] << numbers[2] << numbers[3] << numbers[4] << numbers[5] << ends;
-
+	
 	//right side
 	for (int i = 50; i < 92; i += 7)
 	{
@@ -320,7 +312,6 @@ vector<int> GetNumbers(string code)
 			n = 9;
 		numbers.push_back(n);
 	}
-//	cout << numbers[6] << numbers[7] << numbers[8] << numbers[9] << numbers[10] << numbers[11] << endl;
 	return numbers;
 }
 
@@ -329,10 +320,10 @@ vector<int> GetInfo(Mat& img)
 	return GetNumbers(GetBinaryCode(img));
 }
 
-//recovers barcode from binary code?
+//recovers barcode from binary code
 Mat RecoverBarcode(string code)
 {
-	Mat BarCode(400, 95*5 + 40, CV_8UC3, Scalar(255, 255, 255));
+	Mat BarCode(400, 95 * 5 + 40, CV_8UC3, Scalar(255, 255, 255));
 
 	for (int i = 0; i < 95; i++)
 	{
@@ -359,25 +350,16 @@ Mat RecoverBarcode(string code)
 
 int main()
 {
-	Mat img = imread("example7.jpg");
-//	namedWindow("Window", WINDOW_AUTOSIZE & WINDOW_NORMAL);	
+	Mat img = imread("example9.png");
 
 	AdaptiveBinarization(img);
 	HoughTransform(img);
-	
-	imshow("Binarized", img);
-//	for (int i = 0; i < 1; ++i)
 	MedianFilter(img);
-	imshow("Median", img);
-	MinFilter(img);
-	imshow("Min", img);
+	AdaptiveBinarization(img);
 	string code = GetBinaryCode(img);
-	Mat newImg=RecoverBarcode(code);
-//	vector<int> vec = GetNumbers(code);
-	
+	Mat newImg = RecoverBarcode(code);
 
 	imshow("Window", newImg);
-//	imwrite("recovered.jpg", newImg);
 	waitKey(0);
 	return 0;
 }
